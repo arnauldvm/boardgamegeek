@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?><items termsofuse="https://boardgamegeek.com/xmlapi/termsofuse"><item type="videogame" id="68407">
+         <thumbnail>https://cf.geekdo-images.com/thumb/img/JeII0MFNTOxoRpuk2Mqu7O6dXqY=/fit-in/200x150/pic1508241.jpg</thumbnail>
+      <image>https://cf.geekdo-images.com/original/img/hcd7Y9db3Ed3827WJmzeOkBqyUc=/0x0/pic1508241.jpg</image>
+                                     				
+				<name type="primary" sortindex="1" value="Super Mario Bros." />
+			
+						                               				
+				<name type="alternate" sortindex="1" value="Super Mario Brothers" />
+			
+						               													<description>From the game box:&amp;#10;&amp;#10;Do you have what it takes to save the Mushroom Princess?&amp;#10;&amp;#10;You'll have to think fast and move even faster to complete this quest! The Mushroom Princess is being held captive by the evil Koopa tribe of turtles. It's up to you to rescue her from the evil clutches of King Koopa before time runs out. But it won't be easy. To get to the princess, you'll have to climb mountains, cross seas, avoid bottomless pits, fight off turtle soldiers and a host of black magic traps that only a Koopa King can devise! It's another non-stop adventure from the Super Mario bros.!&amp;#10;&amp;#10;Individual credits:&amp;#10;Koji Kondo: Music&amp;#10;&amp;#10;</description>
+										      				
+		 			
+
+			
+		
+					<link type="videogameplatform" id="4423" value="Game Boy Advance" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogameplatform" id="4430" value="NES" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogameplatform" id="5857" value="Nintendo 3DS" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogameplatform" id="4441" value="Wii" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogameplatform" id="10763" value="Wii U" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="videogamegenre" id="2164" value="Platform" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="videogametheme" id="2337" value="Cute Fantasy" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="videogamefranchise" id="4868" value="Mario" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogamefranchise" id="28200" value="NES Black Box (1980s NES Games, US)" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="videogameseries" id="4735" value="Super Mario" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="videogamemode" id="2313" value="Cooperative" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogamemode" id="2149" value="Single-Player" />
+		
+									
+			
+
+			               				<minplayers value="1" />
+						               				<maxplayers value="2" />
+						               				<releasedate value="1985-09-13" />
+						      				
+		 			
+
+			
+		
+					<link type="videogamedeveloper" id="1326" value="Nintendo Co., Ltd." />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="videogamepublisher" id="1326" value="Nintendo Co., Ltd." />
+		
+									
+			
+
+			      			
+
+			      			
+
+			      			
+
+			      				
+		 			
+
+			
+		
+					<link type="videogamecompilation" id="106309" value="Nintendo World Championships 1990" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogamecompilation" id="75600" value="Super Mario All-Stars" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogamecompilation" id="91004" value="Super Mario Bros. / Duck Hunt" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogamecompilation" id="78879" value="Super Mario Bros. / Duck Hunt / World Class Track Meet" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="videogamecompilation" id="105392" value="Super Mario Bros. / Tetris / Nintendo World Cup" />
+		
+									
+			
+
+			
+	
+
+	
+
+	
+	
+	
+   		<statistics page="1">
+								<ratings >
+			<usersrated value="657" />
+			<average value="7.55435" />
+			<bayesaverage value="7.33594" />
+
+			<ranks>
+															<rank type="subtype" id="32" name="videogame" friendlyname="Video Game Rank" value="222" bayesaverage="7.33594" />
+																				<rank type="family" id="4423" name="gameboyadvance" friendlyname="Game Boy Advance Rank" value="24" bayesaverage="7.36887" />
+											<rank type="family" id="4430" name="nes" friendlyname="NES Rank" value="10" bayesaverage="7.39484" />
+											<rank type="family" id="4441" name="wii" friendlyname="Wii Rank" value="47" bayesaverage="7.38776" />
+											<rank type="family" id="5857" name="nintendo3ds" friendlyname="Nintendo 3DS Rank" value="36" bayesaverage="7.367" />
+											<rank type="family" id="10763" name="wiiu" friendlyname="Wii U Rank" value="46" bayesaverage="7.36393" />
+												</ranks>
+
+			<stddev value="1.4639" />
+			<median value="0" />
+			<owned value="547" />
+			<trading value="5" />
+			<wanting value="2" />
+			<wishing value="3" />
+			<numcomments value="73" />
+			<numweights value="19" />
+			<averageweight value="2.7368" />
+			</ratings>
+								</statistics>
+     
+	
+          
+</item>
+</items>

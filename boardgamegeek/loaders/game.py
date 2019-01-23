@@ -14,7 +14,8 @@ def create_game_from_xml(xml_root, game_id):
             "boardgame": "boardgame",
             "boardgameexpansion": "boardgame",
             "boardgameaccessory": "boardgame",
-            "rpgitem": "rpg"}
+            "rpgitem": "rpg",
+            "videogame": "videogame"}
 
     game_type = xml_root.attrib["type"]
     if game_type not in supported_types:

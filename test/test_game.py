@@ -265,3 +265,14 @@ def test_get_rpgitem(bgg, mocker):
     assert "TSR" in game.publishers
     assert "Twenty-First Century Games" in game.publishers
     assert "Wizards of the Coast" in game.publishers
+
+def test_get_videogame(bgg, mocker):
+    mock_get = mocker.patch("requests.sessions.Session.get")
+    mock_get.side_effect = simulate_bgg
+
+    game = bgg.game(game_id=TEST_VIDEO_GAME_ID)
+
+    assert game.id == TEST_VIDEO_GAME_ID
+
+    assert len(game.publishers) == 1
+    assert game.publishers[0] == 'Nintendo Co., Ltd.'

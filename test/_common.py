@@ -34,6 +34,8 @@ TEST_GAME_ACCESSORY_ID = 104163 # Descent: Journeys in the Dark (second edition)
 
 TEST_RPG_ITEM_ID = 43359 # AD&D 1e Players Handbook
 
+TEST_VIDEO_GAME_ID = 68407 # Super Mario Bros.
+
 if sys.version_info >= (3,):
     STR_TYPES_OR_NONE = [str, type(None)]
 else:
