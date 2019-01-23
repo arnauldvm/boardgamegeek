@@ -34,9 +34,9 @@ def create_game_from_xml(xml_root, game_id):
             "categories": xml_subelement_attr_list(xml_root, _link_type(site, "category")),
             "implementations": xml_subelement_attr_list(xml_root, "link[@type='boardgameimplementation']"),
             "mechanics": xml_subelement_attr_list(xml_root, _link_type(site, "mechanic")),
-            "designers": xml_subelement_attr_list(xml_root, "link[@type='boardgamedesigner']"),
-            "artists": xml_subelement_attr_list(xml_root, "link[@type='boardgameartist']"),
-            "publishers": xml_subelement_attr_list(xml_root, "link[@type='boardgamepublisher']"),
+            "designers": xml_subelement_attr_list(xml_root, _link_type(site, "designer")),
+            "artists": xml_subelement_attr_list(xml_root, _link_type(site, "artist")),
+            "publishers": xml_subelement_attr_list(xml_root, _link_type(site, "publisher")),
             "description": xml_subelement_text(xml_root, "description", convert=html_unescape, quiet=True)}
 
     expands = []        # list of items this game expands

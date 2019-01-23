@@ -251,3 +251,17 @@ def test_get_rpgitem(bgg, mocker):
     assert "Level Based (Earn XP and level up)" in game.mechanics
     assert "Race Based (Player Race/Species affects gameplay)" in game.mechanics
     assert "Random Attribute Generation (during Character Creation)" in game.mechanics
+
+    assert len(game.designers) == 1
+    assert game.designers[0] == "Gary Gygax"
+
+    assert len(game.artists) == 3
+    assert "Jeff Easley" in game.artists
+    assert "David C. Sutherland, III" in game.artists
+    assert "David A. Trampier" in game.artists
+
+    assert len(game.publishers) == 4
+    assert "Games Workshop Ltd." in game.publishers
+    assert "TSR" in game.publishers
+    assert "Twenty-First Century Games" in game.publishers
+    assert "Wizards of the Coast" in game.publishers
