@@ -243,3 +243,11 @@ def test_get_rpgitem(bgg, mocker):
 
     assert len(game.categories) == 1
     assert game.categories[0] == "Core Rules (min needed to play)"
+
+    assert len(game.mechanics) == 6
+    assert "Attribute/Stat Based (STR, CON, PER, etc)" in game.mechanics
+    assert "Class Based (Pilot, Wizard, Scientist, etc)" in game.mechanics
+    assert "Dice (Various)" in game.mechanics
+    assert "Level Based (Earn XP and level up)" in game.mechanics
+    assert "Race Based (Player Race/Species affects gameplay)" in game.mechanics
+    assert "Random Attribute Generation (during Character Creation)" in game.mechanics

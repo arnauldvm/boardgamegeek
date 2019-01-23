@@ -22,7 +22,6 @@ def create_game_from_xml(xml_root, game_id):
         raise BGGApiError("item has an unsupported type {}".format(game_type))
 
     site = supported_types[game_type]
-    categoriestype = "link[@type='" + site + "category']"
 
     data = {"id": game_id,
             "name": xml_subelement_attr(xml_root, "name[@type='primary']"),
@@ -32,9 +31,9 @@ def create_game_from_xml(xml_root, game_id):
             "expansion": game_type == "boardgameexpansion",       # is this game an expansion?
             "accessory": game_type == "boardgameaccessory",       # is this game an accessory?
             "families": xml_subelement_attr_list(xml_root, "link[@type='boardgamefamily']"),
-            "categories": xml_subelement_attr_list(xml_root, categoriestype),
+            "categories": xml_subelement_attr_list(xml_root, _link_type(site, "category")),
             "implementations": xml_subelement_attr_list(xml_root, "link[@type='boardgameimplementation']"),
-            "mechanics": xml_subelement_attr_list(xml_root, "link[@type='boardgamemechanic']"),
+            "mechanics": xml_subelement_attr_list(xml_root, _link_type(site, "mechanic")),
             "designers": xml_subelement_attr_list(xml_root, "link[@type='boardgamedesigner']"),
             "artists": xml_subelement_attr_list(xml_root, "link[@type='boardgameartist']"),
             "publishers": xml_subelement_attr_list(xml_root, "link[@type='boardgamepublisher']"),
@@ -177,3 +176,6 @@ def add_game_comments_from_xml(game, xml_root):
             game.add_comment(comment)
 
     return added_items, total_comments
+
+def _link_type(site, linktype):
+    return "link[@type='{}{}']".format(site, linktype)
