@@ -231,3 +231,15 @@ def test_get_accessory(bgg, mocker):
 
     assert game.id == TEST_GAME_ACCESSORY_ID
     assert game.accessory
+
+
+def test_get_rpgitem(bgg, mocker):
+    mock_get = mocker.patch("requests.sessions.Session.get")
+    mock_get.side_effect = simulate_bgg
+
+    game = bgg.game(game_id=TEST_RPG_ITEM_ID)
+
+    assert game.id == TEST_RPG_ITEM_ID
+
+    assert len(game.categories) == 1
+    assert game.categories[0] == "Core Rules (min needed to play)"

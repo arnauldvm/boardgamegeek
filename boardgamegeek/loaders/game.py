@@ -9,10 +9,20 @@ log = logging.getLogger("boardgamegeek.loaders.game")
 
 def create_game_from_xml(xml_root, game_id):
 
+    # The types we support and which BGG network site they belong to
+    supported_types = {
+            "boardgame": "boardgame",
+            "boardgameexpansion": "boardgame",
+            "boardgameaccessory": "boardgame",
+            "rpgitem": "rpg"}
+
     game_type = xml_root.attrib["type"]
-    if game_type not in ["boardgame", "boardgameexpansion", "boardgameaccessory"]:
+    if game_type not in supported_types:
         log.debug("unsupported type {} for item id {}".format(game_type, game_id))
-        raise BGGApiError("item has an unsupported type")
+        raise BGGApiError("item has an unsupported type {}".format(game_type))
+
+    site = supported_types[game_type]
+    categoriestype = "link[@type='" + site + "category']"
 
     data = {"id": game_id,
             "name": xml_subelement_attr(xml_root, "name[@type='primary']"),
@@ -22,7 +32,7 @@ def create_game_from_xml(xml_root, game_id):
             "expansion": game_type == "boardgameexpansion",       # is this game an expansion?
             "accessory": game_type == "boardgameaccessory",       # is this game an accessory?
             "families": xml_subelement_attr_list(xml_root, "link[@type='boardgamefamily']"),
-            "categories": xml_subelement_attr_list(xml_root, "link[@type='boardgamecategory']"),
+            "categories": xml_subelement_attr_list(xml_root, categoriestype),
             "implementations": xml_subelement_attr_list(xml_root, "link[@type='boardgameimplementation']"),
             "mechanics": xml_subelement_attr_list(xml_root, "link[@type='boardgamemechanic']"),
             "designers": xml_subelement_attr_list(xml_root, "link[@type='boardgamedesigner']"),
