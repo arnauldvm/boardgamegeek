@@ -8,8 +8,9 @@ import time
 
 from _common import *
 from boardgamegeek import BGGError, BGGItemNotFoundError, BGGValueError
-from boardgamegeek.objects.games import BoardGameVideo, BoardGameVersion, BoardGameRank
+from boardgamegeek.objects.games import BoardGameVideo, BoardGameVersion
 from boardgamegeek.objects.games import PlayerSuggestion
+from boardgamegeek.objects.things import BoardGameRank
 
 
 def test_get_unknown_game_info(bgg, mocker):

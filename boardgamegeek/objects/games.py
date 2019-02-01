@@ -15,27 +15,9 @@ from __future__ import unicode_literals
 import datetime
 from copy import copy
 
-from .things import Thing
+from .things import Thing, BaseItem
 from ..exceptions import BGGError
 from ..utils import fix_url, DictObject, fix_unsigned_negative
-
-
-class BoardGameRank(Thing):
-    @property
-    def type(self):
-        return self._data.get("type")
-
-    @property
-    def friendly_name(self):
-        return self._data.get("friendlyname")
-
-    @property
-    def value(self):
-        return self._data.get("value")
-
-    @property
-    def rating_bayes_average(self):
-        return self._data.get("bayesaverage")
 
 
 class PlayerSuggestion(DictObject):
@@ -56,158 +38,6 @@ class PlayerSuggestion(DictObject):
             return int(self.player_count[:-1]) + 1
         else:
             return int(self.player_count)
-
-
-class BoardGameStats(DictObject):
-    """
-    Statistics about a board game
-    """
-    def __init__(self, data):
-        self._ranks = []
-
-        for rank in data.get("ranks", []):
-            if rank.get("name") == "boardgame":
-                try:
-                    self._bgg_rank = int(rank["value"])
-                except (KeyError, TypeError):
-                    self._bgg_rank = None
-            self._ranks.append(BoardGameRank(rank))
-
-        super(BoardGameStats, self).__init__(data)
-
-    @property
-    def bgg_rank(self):
-        return self._bgg_rank
-
-    @property
-    def ranks(self):
-        return self._ranks
-
-    @property
-    def users_rated(self):
-        """
-        :return: how many users rated the game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("usersrated")
-
-    @property
-    def rating_average(self):
-        """
-        :return: average rating
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._data.get("average")
-
-    @property
-    def rating_bayes_average(self):
-        """
-        :return: bayes average rating
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._data.get("bayesaverage")
-
-    @property
-    def rating_stddev(self):
-        """
-        :return: standard deviation
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._data.get("stddev")
-
-    @property
-    def rating_median(self):
-        """
-        :return:
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._data.get("median")
-
-    @property
-    def users_owned(self):
-        """
-        :return: number of users owning this game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("owned")
-
-    @property
-    def users_trading(self):
-        """
-        :return: number of users trading this game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("trading")
-
-    @property
-    def users_wanting(self):
-        """
-        :return: number of users wanting this game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("wanting")
-
-    @property
-    def users_wishing(self):
-        """
-        :return: number of users wishing for this game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("wishing")
-
-    @property
-    def users_commented(self):
-        """
-        :return: number of user comments
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("numcomments")
-
-    @property
-    def rating_num_weights(self):
-        """
-        :return:
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("numweights")
-
-    @property
-    def rating_average_weight(self):
-        """
-        :return: average weight
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._data.get("averageweight")
-
-
-class BoardGameComment(DictObject):
-
-    @property
-    def commenter(self):
-        return self._data["username"]
-
-    @property
-    def comment(self):
-        return self._data["comment"]
-
-    @property
-    def rating(self):
-        return self._data["rating"]
-
-    def _format(self, log):
-        log.info(u"comment by {} (rating: {}): {}".format(self.commenter, self.rating, self.comment))
 
 
 class BoardGameVideo(Thing):
@@ -415,17 +245,9 @@ class BoardGameVersion(Thing):
         return self._data.get("yearpublished")
 
 
-class BaseGame(Thing):
+class BaseGame(BaseItem):
 
     def __init__(self, data):
-
-        self._thumbnail = fix_url(data["thumbnail"]) if "thumbnail" in data else None
-        self._image = fix_url(data["image"]) if "image" in data else None
-        if "stats" not in data:
-            raise BGGError("invalid data")
-
-        self._stats = BoardGameStats(data["stats"])
-
         self._versions = []
         self._versions_set = set()
 
@@ -443,24 +265,6 @@ class BaseGame(Thing):
                 raise BGGError("invalid version data")
 
         super(BaseGame, self).__init__(data)
-
-    @property
-    def thumbnail(self):
-        """
-        :return: thumbnail URL
-        :rtype: str
-        :return: ``None`` if n/a
-        """
-        return self._thumbnail
-
-    @property
-    def image(self):
-        """
-        :return: image URL
-        :rtype: str
-        :return: ``None`` if n/a
-        """
-        return self._image
 
     @property
     def year(self):
@@ -515,64 +319,6 @@ class BaseGame(Thing):
         :return: ``None`` if n/a
         """
         return self._data.get("playingtime")
-
-    # TODO: create properties to access the stats
-
-    @property
-    def users_rated(self):
-        """
-        :return: how many users rated the game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._stats.users_rated
-
-    @property
-    def rating_average(self):
-        """
-        :return: average rating
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._stats.rating_average
-
-    @property
-    def rating_bayes_average(self):
-        """
-        :return: bayes average rating
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._stats.rating_bayes_average
-
-    @property
-    def rating_stddev(self):
-        """
-        :return: standard deviation
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._stats.rating_stddev
-
-    @property
-    def rating_median(self):
-        """
-        :return:
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._stats.rating_median
-
-    @property
-    def ranks(self):
-        #TODO: document this change. It's not returning list of dicts anymore, but BoardGameRank objects
-        """
-        :return: rankings of this game
-        :rtype: list of dicts, keys: ``friendlyname`` (the friendly name of the rank, e.g. "Board Game Rank"), ``name``
-                (name of the rank, e.g "boardgame"), ``value`` (the rank)
-        :return: ``None`` if n/a
-        """
-        return self._stats.ranks
 
     @property
     def bgg_rank(self):
