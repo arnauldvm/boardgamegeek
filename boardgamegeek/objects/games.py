@@ -588,11 +588,16 @@ class VideoGame(BaseItem, FullItem):
     def __init__(self, data):
         super(VideoGame, self).__init__(data)
 
-    @property
-    def platforms(self):
-        """
-        :return: platforms
-        :rtype: list of str
-        """
-        return self._data.get("platforms", [])
+    def __repr__(self):
+        return "VideoGame (id: {})".format(self.id)
 
+
+class RPGItem(BaseItem, FullItem):
+    """
+    Object containing information about an RPG item
+    """
+    def __init__(self, data):
+        super(RPGItem, self).__init__(data)
+
+    def __repr__(self):
+        return "RPGItem (id: {})".format(self.id)

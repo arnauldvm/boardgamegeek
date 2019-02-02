@@ -8,7 +8,8 @@ import time
 
 from _common import *
 from boardgamegeek import BGGError, BGGItemNotFoundError, BGGValueError
-from boardgamegeek.objects.games import BoardGame, VideoGame, BoardGameVersion, PlayerSuggestion
+from boardgamegeek.objects.games import BoardGame, VideoGame, RPGItem
+from boardgamegeek.objects.games import BoardGameVersion, PlayerSuggestion
 from boardgamegeek.objects.things import BoardGameRank, BoardGameVideo
 
 
@@ -240,6 +241,8 @@ def test_get_rpgitem(bgg, mocker):
 
     game = bgg.game(game_id=TEST_RPG_ITEM_ID)
 
+    assert isinstance(game, RPGItem)
+
     assert game.id == TEST_RPG_ITEM_ID
 
     assert len(game.categories) == 1
@@ -267,6 +270,13 @@ def test_get_rpgitem(bgg, mocker):
     assert "Twenty-First Century Games" in game.publishers
     assert "Wizards of the Coast" in game.publishers
 
+    assert len(game.genres) == 1
+    assert game.genres[0] == "Fantasy (High Fantasy)"
+
+    assert len(game.series) == 1
+    assert game.series[0] == "TSR Silver Anniversary Miniature Reprints"
+
+
 def test_get_videogame(bgg, mocker):
     mock_get = mocker.patch("requests.sessions.Session.get")
     mock_get.side_effect = simulate_bgg
@@ -278,7 +288,7 @@ def test_get_videogame(bgg, mocker):
     assert game.id == TEST_VIDEO_GAME_ID
 
     assert len(game.publishers) == 1
-    assert game.publishers[0] == 'Nintendo Co., Ltd.'
+    assert game.publishers[0] == "Nintendo Co., Ltd."
 
     assert len(game.platforms) == 5
     assert "Game Boy Advance" in game.platforms
@@ -286,3 +296,30 @@ def test_get_videogame(bgg, mocker):
     assert "Nintendo 3DS" in game.platforms
     assert "Wii" in game.platforms
     assert "Wii U" in game.platforms
+
+    assert len(game.genres) == 1
+    assert game.genres[0] == "Platform"
+
+    assert len(game.themes) == 1
+    assert game.themes[0] == "Cute Fantasy"
+
+    assert len(game.franchises) == 2
+    assert "Mario" in game.franchises
+    assert "NES Black Box (1980s NES Games, US)" in game.franchises
+
+    assert len(game.series) == 1
+    assert game.series[0] == "Super Mario"
+
+    assert len(game.modes) == 2
+    assert "Cooperative" in game.modes
+    assert "Single-Player" in game.modes
+
+    assert len(game.developers) == 1
+    assert game.developers[0] == "Nintendo Co., Ltd."
+
+    assert len(game.compilations) == 5
+    assert "Nintendo World Championships 1990" in game.compilations
+    assert "Super Mario All-Stars" in game.compilations
+    assert "Super Mario Bros. / Duck Hunt" in game.compilations
+    assert "Super Mario Bros. / Duck Hunt / World Class Track Meet" in game.compilations
+    assert "Super Mario Bros. / Tetris / Nintendo World Cup" in game.compilations

@@ -1,6 +1,6 @@
 import logging
 
-from ..objects.games import BoardGame, VideoGame
+from ..objects.games import BoardGame, VideoGame, RPGItem
 from ..exceptions import BGGApiError
 from ..utils import xml_subelement_attr_list, xml_subelement_text, xml_subelement_attr, get_board_game_version_from_element, html_unescape
 
@@ -15,7 +15,7 @@ def create_game_from_xml(xml_root, game_id):
             "boardgame": ("boardgame", BoardGame),
             "boardgameexpansion": ("boardgame", BoardGame),
             "boardgameaccessory": ("boardgame", BoardGame),
-            "rpgitem": ("rpg", BoardGame),
+            "rpgitem": ("rpg", RPGItem),
             "videogame": ("videogame", VideoGame)}
 
     game_type = xml_root.attrib["type"]
@@ -36,6 +36,10 @@ def create_game_from_xml(xml_root, game_id):
             "publishers": xml_subelement_attr_list(xml_root, _link_type(site, "publisher")),
             "description": xml_subelement_text(xml_root, "description", convert=html_unescape, quiet=True),
 
+            # Board game and video game properties
+            "genres": xml_subelement_attr_list(xml_root, _link_type(site, "genre")),
+            "series": xml_subelement_attr_list(xml_root, _link_type(site, "series")),
+
             # Board game and RPG item properties
             "categories": xml_subelement_attr_list(xml_root, _link_type(site, "category")),
             "mechanics": xml_subelement_attr_list(xml_root, _link_type(site, "mechanic")),
@@ -49,6 +53,11 @@ def create_game_from_xml(xml_root, game_id):
 
             # Video game properties
             "platforms": xml_subelement_attr_list(xml_root, _link_type(site, "platform")),
+            "themes": xml_subelement_attr_list(xml_root, _link_type(site, "theme")),
+            "franchises": xml_subelement_attr_list(xml_root, _link_type(site, "franchise")),
+            "modes": xml_subelement_attr_list(xml_root, _link_type(site, "mode")),
+            "developers": xml_subelement_attr_list(xml_root, _link_type(site, "developer")),
+            "compilations": xml_subelement_attr_list(xml_root, _link_type(site, "compilation")),
             }
 
     expands = []        # list of items this game expands
