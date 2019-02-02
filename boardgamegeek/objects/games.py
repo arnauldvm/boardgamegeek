@@ -12,10 +12,9 @@
 """
 from __future__ import unicode_literals
 
-import datetime
 from copy import copy
 
-from .things import Thing, BaseItem
+from .things import Thing, BaseItem, FullItem
 from ..exceptions import BGGError
 from ..utils import fix_url, DictObject, fix_unsigned_negative
 
@@ -38,90 +37,6 @@ class PlayerSuggestion(DictObject):
             return int(self.player_count[:-1]) + 1
         else:
             return int(self.player_count)
-
-
-class BoardGameVideo(Thing):
-    """
-    Object containing information about a board game video
-    """
-    def __init__(self, data):
-        kw = copy(data)
-
-        if "post_date" in kw:
-            date = kw["post_date"]
-            if type(date) != datetime.datetime:
-                try:
-                    kw["post_date"] = datetime.datetime.strptime(date[:-6], "%Y-%m-%dT%H:%M:%S")
-                except:
-                    kw["post_date"] = None
-
-        kw["uploader_id"] = int(kw["uploader_id"])
-
-        super(BoardGameVideo, self).__init__(kw)
-
-    def _format(self, log):
-        log.info("video id          : {}".format(self.id))
-        log.info("video title       : {}".format(self.name))
-        log.info("video category    : {}".format(self.category))
-        log.info("video link        : {}".format(self.link))
-        log.info("video language    : {}".format(self.language))
-        log.info("video uploader    : {}".format(self.uploader))
-        log.info("video uploader id : {}".format(self.uploader_id))
-        log.info("video posted at   : {}".format(self.post_date))
-
-    @property
-    def category(self):
-        """
-        :return: the category of this video
-        :return: ``None`` if n/a
-        :rtype: string
-        """
-        return self._data.get("category")
-
-    @property
-    def link(self):
-        """
-        :return: the link to this video
-        :return: ``None`` if n/a
-        :rtype: string
-        """
-        return self._data.get("link")
-
-    @property
-    def language(self):
-        """
-        :return: the language of this video
-        :return: ``None`` if n/a
-        :rtype: string
-        """
-        return self._data.get("language")
-
-    @property
-    def uploader(self):
-        """
-        :return: the name of the user which uploaded this video
-        :return: ``None`` if n/a
-        :rtype: string
-        """
-        return self._data.get("uploader")
-
-    @property
-    def uploader_id(self):
-        """
-        :return: id of the uploader
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("uploader_id")
-
-    @property
-    def post_date(self):
-        """
-        :return: date when this video was uploaded
-        :rtype: datetime.datetime
-        :return: ``None`` if n/a
-        """
-        return self._data.get("post_date")
 
 
 class BoardGameVersion(Thing):
@@ -476,46 +391,11 @@ class CollectionBoardGame(BaseGame):
         return self._data.get("comment", "")
 
 
-class BoardGame(BaseGame):
+class BoardGame(BaseGame, FullItem):
     """
     Object containing information about a board game
     """
     def __init__(self, data):
-
-        self._expansions = []                      # list of Thing for the expansions
-        self._expansions_set = set()               # set for making sure things are unique
-        for exp in data.get("expansions", []):
-            try:
-                if exp["id"] not in self._expansions_set:
-                    self._expansions_set.add(exp["id"])
-                    self._expansions.append(Thing(exp))
-            except KeyError:
-                raise BGGError("invalid expansion data")
-
-        self._expands = []                         # list of Thing which this item expands
-        self._expands_set = set()                  # set for keeping things unique
-        for exp in data.get("expands", []):        # for all the items this game expands, create a Thing
-            try:
-                if exp["id"] not in self._expands_set:
-                    self._expands_set.add(exp["id"])
-                    self._expands.append(Thing(exp))
-            except KeyError:
-                raise BGGError("invalid expanded game data")
-
-        self._videos = []
-        self._videos_ids = set()
-        for video in data.get("videos", []):
-            try:
-                if video["id"] not in self._videos_ids:
-                    self._videos.append(BoardGameVideo(video))
-                    self._videos_ids.add(video["id"])
-            except KeyError:
-                raise BGGError("invalid video data")
-
-        self._comments = []
-        for comment in data.get("comments", []):
-            self.add_comment(comment)
-
         self._player_suggestion = []
         if "suggested_players" in data and "results" in data["suggested_players"]:
             for count, result in data["suggested_players"]["results"].items():
@@ -529,39 +409,6 @@ class BoardGame(BaseGame):
 
     def __repr__(self):
         return "BoardGame (id: {})".format(self.id)
-
-    def add_comment(self, data):
-        self._comments.append(BoardGameComment(data))
-
-    def add_expanded_game(self, data):
-        """
-        Add a game expanded by this one
-
-        :param dict data: expanded game's data
-        :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekError` if data is invalid
-        """
-        try:
-            if data["id"] not in self._expands_set:
-                self._data["expands"].append(data)
-                self._expands_set.add(data["id"])
-                self._expands.append(Thing(data))
-        except KeyError:
-            raise BGGError("invalid expanded game data")
-
-    def add_expansion(self, data):
-        """
-        Add an expansion of this game
-
-        :param dict data: expansion data
-        :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekError` if data is invalid
-        """
-        try:
-            if data["id"] not in self._expansions_set:
-                self._data["expansions"].append(data)
-                self._expansions_set.add(data["id"])
-                self._expansions.append(Thing(data))
-        except KeyError:
-            raise BGGError("invalid expansion data")
 
     def _format(self, log):
         log.info("boardgame id      : {}".format(self.id))
@@ -661,22 +508,6 @@ class BoardGame(BaseGame):
                 c._format(log)
 
     @property
-    def alternative_names(self):
-        """
-        :return: alternative names
-        :rtype: list of str
-        """
-        return self._data.get("alternative_names", [])
-
-    @property
-    def description(self):
-        """
-        :return: description
-        :rtype: str
-        """
-        return self._data.get("description", "")
-
-    @property
     def families(self):
         """
         :return: families
@@ -693,32 +524,12 @@ class BoardGame(BaseGame):
         return self._data.get("categories", [])
 
     @property
-    def comments(self):
-        return self._comments
-
-    @property
     def mechanics(self):
         """
         :return: mechanics
         :rtype: list of str
         """
         return self._data.get("mechanics", [])
-
-    @property
-    def expansions(self):
-        """
-        :return: expansions
-        :rtype: list of :py:class:`boardgamegeek.things.Thing`
-        """
-        return self._expansions
-
-    @property
-    def expands(self):
-        """
-        :return: games this item expands
-        :rtype: list of :py:class:`boardgamegeek.things.Thing`
-        """
-        return self._expands
 
     @property
     def implementations(self):
@@ -745,22 +556,6 @@ class BoardGame(BaseGame):
         return self._data.get("artists", [])
 
     @property
-    def publishers(self):
-        """
-        :return: publishers
-        :rtype: list of str
-        """
-        return self._data.get("publishers", [])
-
-    @property
-    def expansion(self):
-        """
-        :return: True if this item is an expansion
-        :rtype: bool
-        """
-        return self._data.get("expansion", False)
-
-    @property
     def accessory(self):
         """
         :return: True if this item is an accessory
@@ -776,85 +571,6 @@ class BoardGame(BaseGame):
         :return: ``None`` if n/a
         """
         return self._data.get("minage")
-
-    @property
-    def users_owned(self):
-        """
-        :return: number of users owning this game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._stats.users_owned
-
-    @property
-    def users_trading(self):
-        """
-        :return: number of users trading this game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._stats.users_trading
-
-    @property
-    def users_wanting(self):
-        """
-        :return: number of users wanting this game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("wanting")
-
-    @property
-    def users_wishing(self):
-        """
-        :return: number of users wishing for this game
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("wishing")
-
-    @property
-    def users_commented(self):
-        """
-        :return: number of user comments
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._data.get("numcomments")
-
-    @property
-    def rating_num_weights(self):
-        """
-        :return:
-        :rtype: integer
-        :return: ``None`` if n/a
-        """
-        return self._stats.rating_num_weights
-
-    @property
-    def rating_average_weight(self):
-        """
-        :return: average weight
-        :rtype: float
-        :return: ``None`` if n/a
-        """
-        return self._stats.rating_average_weight
-
-    @property
-    def videos(self):
-        """
-        :return: videos of this game
-        :rtype: list of :py:class:`boardgamegeek.game.BoardGameVideo`
-        """
-        return self._videos
-
-    @property
-    def versions(self):
-        """
-        :return: versions of this game
-        :rtype: list of :py:class:`boardgamegeek.game.BoardGameVersion`
-        """
-        return self._versions
 
     @property
     def player_suggestions(self):
