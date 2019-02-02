@@ -58,6 +58,9 @@ def create_game_from_xml(xml_root, game_id):
             "modes": xml_subelement_attr_list(xml_root, _link_type(site, "mode")),
             "developers": xml_subelement_attr_list(xml_root, _link_type(site, "developer")),
             "compilations": xml_subelement_attr_list(xml_root, _link_type(site, "compilation")),
+
+            # RPG item properties
+            "producers": xml_subelement_attr_list(xml_root, _link_type(site, "producer")),
             }
 
     expands = []        # list of items this game expands
