@@ -1,6 +1,6 @@
 import logging
 
-from ..objects.games import BoardGame
+from ..objects.games import BoardGame, VideoGame
 from ..exceptions import BGGApiError
 from ..utils import xml_subelement_attr_list, xml_subelement_text, xml_subelement_attr, get_board_game_version_from_element, html_unescape
 
@@ -9,36 +9,47 @@ log = logging.getLogger("boardgamegeek.loaders.game")
 
 def create_game_from_xml(xml_root, game_id):
 
-    # The types we support and which BGG network site they belong to
+    # The types we support, which BGG network site they belong to and the type
+    # of object we will create for each type
     supported_types = {
-            "boardgame": "boardgame",
-            "boardgameexpansion": "boardgame",
-            "boardgameaccessory": "boardgame",
-            "rpgitem": "rpg",
-            "videogame": "videogame"}
+            "boardgame": ("boardgame", BoardGame),
+            "boardgameexpansion": ("boardgame", BoardGame),
+            "boardgameaccessory": ("boardgame", BoardGame),
+            "rpgitem": ("rpg", BoardGame),
+            "videogame": ("videogame", VideoGame)}
 
     game_type = xml_root.attrib["type"]
     if game_type not in supported_types:
         log.debug("unsupported type {} for item id {}".format(game_type, game_id))
         raise BGGApiError("item has an unsupported type {}".format(game_type))
 
-    site = supported_types[game_type]
+    site, factoryfn = supported_types[game_type]
 
-    data = {"id": game_id,
+    data = {
+            # Common properties
+            "id": game_id,
             "name": xml_subelement_attr(xml_root, "name[@type='primary']"),
             "alternative_names": xml_subelement_attr_list(xml_root, "name[@type='alternate']"),
             "thumbnail": xml_subelement_text(xml_root, "thumbnail"),
             "image": xml_subelement_text(xml_root, "image"),
-            "expansion": game_type == "boardgameexpansion",       # is this game an expansion?
-            "accessory": game_type == "boardgameaccessory",       # is this game an accessory?
-            "families": xml_subelement_attr_list(xml_root, "link[@type='boardgamefamily']"),
-            "categories": xml_subelement_attr_list(xml_root, _link_type(site, "category")),
             "implementations": xml_subelement_attr_list(xml_root, "link[@type='boardgameimplementation']"),
+            "publishers": xml_subelement_attr_list(xml_root, _link_type(site, "publisher")),
+            "description": xml_subelement_text(xml_root, "description", convert=html_unescape, quiet=True),
+
+            # Board game and RPG item properties
+            "categories": xml_subelement_attr_list(xml_root, _link_type(site, "category")),
             "mechanics": xml_subelement_attr_list(xml_root, _link_type(site, "mechanic")),
             "designers": xml_subelement_attr_list(xml_root, _link_type(site, "designer")),
             "artists": xml_subelement_attr_list(xml_root, _link_type(site, "artist")),
-            "publishers": xml_subelement_attr_list(xml_root, _link_type(site, "publisher")),
-            "description": xml_subelement_text(xml_root, "description", convert=html_unescape, quiet=True)}
+
+            # Board game properties
+            "families": xml_subelement_attr_list(xml_root, "link[@type='boardgamefamily']"),
+            "expansion": game_type == "boardgameexpansion",       # is this game an expansion?
+            "accessory": game_type == "boardgameaccessory",       # is this game an accessory?
+
+            # Video game properties
+            "platforms": xml_subelement_attr_list(xml_root, _link_type(site, "platform")),
+            }
 
     expands = []        # list of items this game expands
     expansions = []     # list of expansions this game has
@@ -155,7 +166,7 @@ def create_game_from_xml(xml_root, game_id):
 
                 dsp["results"][player_count] = dspr
 
-    return BoardGame(data)
+    return factoryfn(data)
 
 
 def add_game_comments_from_xml(game, xml_root):

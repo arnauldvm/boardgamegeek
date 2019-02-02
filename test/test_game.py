@@ -8,7 +8,7 @@ import time
 
 from _common import *
 from boardgamegeek import BGGError, BGGItemNotFoundError, BGGValueError
-from boardgamegeek.objects.games import BoardGameVersion, PlayerSuggestion
+from boardgamegeek.objects.games import BoardGame, VideoGame, BoardGameVersion, PlayerSuggestion
 from boardgamegeek.objects.things import BoardGameRank, BoardGameVideo
 
 
@@ -38,6 +38,7 @@ def test_get_game_with_invalid_parameters(bgg, mocker):
 
 def check_game(game):
     assert game is not None
+    assert isinstance(game, BoardGame)
     assert game.name == TEST_GAME_NAME
     assert game.id == TEST_GAME_ID
     assert game.year == 2007
@@ -272,7 +273,16 @@ def test_get_videogame(bgg, mocker):
 
     game = bgg.game(game_id=TEST_VIDEO_GAME_ID)
 
+    assert isinstance(game, VideoGame)
+
     assert game.id == TEST_VIDEO_GAME_ID
 
     assert len(game.publishers) == 1
     assert game.publishers[0] == 'Nintendo Co., Ltd.'
+
+    assert len(game.platforms) == 5
+    assert "Game Boy Advance" in game.platforms
+    assert "NES" in game.platforms
+    assert "Nintendo 3DS" in game.platforms
+    assert "Wii" in game.platforms
+    assert "Wii U" in game.platforms

@@ -579,3 +579,20 @@ class BoardGame(BaseGame, FullItem):
         :rtype: list of dicts
         """
         return self._player_suggestion
+
+
+class VideoGame(BaseItem, FullItem):
+    """
+    Object containing information about a video game
+    """
+    def __init__(self, data):
+        super(VideoGame, self).__init__(data)
+
+    @property
+    def platforms(self):
+        """
+        :return: platforms
+        :rtype: list of str
+        """
+        return self._data.get("platforms", [])
+
