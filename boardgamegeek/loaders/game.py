@@ -17,48 +17,73 @@ _supported_types = {
 _site_info = {
         "boardgame": {
             "objecttype": BoardGame,
+            "properties": set([
+                "artists",
+                "categories",
+                "designers",
+                "families",
+                "implementations",
+                "mechanics",
+                ])
             },
         "rpg": {
             "objecttype": RPGItem,
+            "properties": set([
+                "artists",
+                "categories",
+                "designers",
+                "genres",
+                "mechanics",
+                "producers",
+                "series",
+                ])
             },
         "videogame": {
-            "objecttype": VideoGame
+            "objecttype": VideoGame,
+            "properties": set([
+                "compilations",
+                "developers",
+                "franchises",
+                "genres",
+                "modes",
+                "platforms",
+                "series",
+                "themes",
+                ])
             }
         }
 
+_common_properties = set([
+        "alternative_names",
+        "description",
+        "image",
+        "name",
+        "publishers",
+        "thumbnail",
+        ])
+
 _property_generators = {
-        # Common properties
-        "name": lambda x, s: xml_subelement_attr(x, "name[@type='primary']"),
         "alternative_names": lambda x, s: xml_subelement_attr_list(x, "name[@type='alternate']"),
-        "thumbnail": lambda x, s: xml_subelement_text(x, "thumbnail"),
-        "image": lambda x, s: xml_subelement_text(x, "image"),
-        "implementations": lambda x, s: xml_subelement_attr_list(x, "link[@type='boardgameimplementation']"),
-        "publishers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "publisher")),
-        "description": lambda x, s: xml_subelement_text(x, "description", convert=html_unescape, quiet=True),
-
-        # Board game and video game properties
-        "genres": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "genre")),
-        "series": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "series")),
-
-        # Board game and RPG item properties
-        "categories": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "category")),
-        "mechanics": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "mechanic")),
-        "designers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "designer")),
         "artists": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "artist")),
-
-        # Board game properties
-        "families": lambda x, s: xml_subelement_attr_list(x, "link[@type='boardgamefamily']"),
-
-        # Video game properties
-        "platforms": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "platform")),
-        "themes": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "theme")),
-        "franchises": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "franchise")),
-        "modes": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "mode")),
-        "developers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "developer")),
+        "categories": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "category")),
         "compilations": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "compilation")),
-
-        # RPG item properties
+        "description": lambda x, s: xml_subelement_text(x, "description", convert=html_unescape, quiet=True),
+        "designers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "designer")),
+        "developers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "developer")),
+        "families": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "family")),
+        "franchises": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "franchise")),
+        "genres": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "genre")),
+        "name": lambda x, s: xml_subelement_attr(x, "name[@type='primary']"),
+        "image": lambda x, s: xml_subelement_text(x, "image"),
+        "implementations": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "implementation")),
+        "mechanics": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "mechanic")),
+        "modes": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "mode")),
+        "platforms": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "platform")),
         "producers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "producer")),
+        "publishers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "publisher")),
+        "series": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "series")),
+        "themes": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "theme")),
+        "thumbnail": lambda x, s: xml_subelement_text(x, "thumbnail"),
         }
 
 def create_game_from_xml(xml_root, game_id):
@@ -70,8 +95,16 @@ def create_game_from_xml(xml_root, game_id):
 
     site = _supported_types[game_type]
     objecttype = _site_info[site]["objecttype"]
+    typeproperties = _site_info[site]["properties"]
 
-    data = {key: generator(xml_root, site) for key, generator in _property_generators.items()}
+    data = {
+            key: generator(xml_root, site)
+            for key, generator
+            in _property_generators.items()
+            if
+                key in _common_properties or
+                key in typeproperties
+            }
 
     data["id"] = game_id
     data["expansion"] = game_type == "boardgameexpansion"       # is this game an expansion?
