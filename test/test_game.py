@@ -279,6 +279,9 @@ def test_get_rpgitem(bgg, mocker):
     assert len(game.producers) == 1
     assert game.producers[0] == "Mike Carr"
 
+    assert len(game.rpg) == 1
+    assert game.rpg[0] == "Advanced Dungeons & Dragons (1st Edition)"
+
 
 def test_get_videogame(bgg, mocker):
     mock_get = mocker.patch("requests.sessions.Session.get")

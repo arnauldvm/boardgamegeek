@@ -35,6 +35,7 @@ _site_info = {
                 "genres",
                 "mechanics",
                 "producers",
+                "rpg",
                 "series",
                 ])
             },
@@ -81,6 +82,7 @@ _property_generators = {
         "platforms": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "platform")),
         "producers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "producer")),
         "publishers": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "publisher")),
+        "rpg": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "")),
         "series": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "series")),
         "themes": lambda x, s: xml_subelement_attr_list(x, _link_type(s, "theme")),
         "thumbnail": lambda x, s: xml_subelement_text(x, "thumbnail"),
