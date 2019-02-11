@@ -64,13 +64,14 @@ class BoardGameStats(DictObject):
     """
     def __init__(self, data):
         self._ranks = []
+        self._bgg_rank = None
 
         for rank in data.get("ranks", []):
             if rank.get("name") == "boardgame":
                 try:
                     self._bgg_rank = int(rank["value"])
                 except (KeyError, TypeError):
-                    self._bgg_rank = None
+                    pass
             self._ranks.append(BoardGameRank(rank))
 
         super(BoardGameStats, self).__init__(data)

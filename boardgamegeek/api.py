@@ -61,6 +61,18 @@ class BGGRestrictSearchResultsTo(object):
     BOARD_GAME_EXPANSION = "boardgameexpansion"
 
 
+class BGGThingTypes(object):
+    """
+    Things that can be fetched via the /xmlapi2/thing api
+    """
+    RPG = "rpgitem"
+    RPG_ISSUE = "rpgissue"
+    VIDEO_GAME = "videogame"
+    BOARD_GAME = "boardgame"
+    BOARD_GAME_EXPANSION = "boardgameexpansion"
+    BOARD_GAME_ACCESSORY = "boardgameaccessory"
+
+
 class BGGRestrictDomainTo(object):
     """
     Constants used in BoardGameGeek.user() calls, for specifying what hot/top items should be restricted to
@@ -73,6 +85,7 @@ class BGGRestrictDomainTo(object):
 class BGGRestrictPlaysTo(object):
     BOARD_GAME = "boardgame"
     BOARD_GAME_EXTENSION = "boardgameexpansion"
+    BOARD_GAME_EXPANSION = "boardgameexpansion"
     BOARD_GAME_ACCESSORY = "boardgameaccessory"
     RPG = "rpgitem"
     VIDEO_GAME = "videogame"
@@ -81,6 +94,7 @@ class BGGRestrictPlaysTo(object):
 class BGGRestrictCollectionTo(object):
     BOARD_GAME = "boardgame"
     BOARD_GAME_EXTENSION = "boardgameexpansion"
+    BOARD_GAME_EXPANSION = "boardgameexpansion"
     BOARD_GAME_ACCESSORY = "boardgameaccessory"
     RPG = "rpgitem"
     RPG_ISSUE = "rpgissue"
@@ -124,15 +138,14 @@ class BGGCommon(object):
         # add the rate limiting adapter
         self.requests_session.mount(api_endpoint, RateLimitingAdapter(rpm=requests_per_minute))
 
-    def _get_game_id(self, name, game_type, choose):
+    def get_thing_id(self, name, thing_type, choose):
         """
         Returns the BGG ID of a game, searching by name
 
         :param str name: the name of the game to search for
-        :param str game_type: searched game type (BGGItemType.RPG, BGGItemType.VIDEO_GAME, BGGItemType.BOARD_GAME,
-                                                  BGGItemType.BOARD_GAME_EXPANSION)
-        :param str choose: method of selecting the game by name, when having multiple results. Valid values are:
-                           `BGGChoose.FIRST`, `BGGChoose.RECENT`, `BGGChoose.BEST_RANK`
+        :param :py:class:`boardgamegeek.api.BGGThingType` thing_type: the type of the thing to return the id for
+        :param boardgamegeek.BGGChoose choose: method of selecting the game by name, when dealing with multiple results.
+                    Valid values are: `BGGChoose.FIRST`, `BGGChoose.RECENT`, `BGGChoose.BEST_RANK`
         :return: game's id
         :raises: :py:exc:`boardgamegeek.exceptions.BGGValueError` in case of invalid parameter(s)
         :raises: :py:exc:`boardgamegeek.exceptions.BGGItemNotFoundError` if the game hasn't been found
@@ -145,7 +158,7 @@ class BGGCommon(object):
             raise BGGValueError("invalid value for parameter 'choose': {}".format(choose))
 
         log.debug("getting game id for '{}'".format(name))
-        res = self.search(name, search_type=[game_type], exact=True)
+        res = self.search(name, search_type=[thing_type], exact=True)
 
         if not res:
             raise BGGItemNotFoundError("can't find '{}'".format(name))
@@ -649,7 +662,8 @@ class BGGCommon(object):
         Search for a game
 
         :param str query: the string to search for
-        :param list search_type: list of :py:class:`boardgamegeek.api.BGGRestrictItemTypeTo`, indicating what to include in the search results.
+        :param list search_type: list of :py:class:`boardgamegeek.api.BGGRestrictItemTypeTo`, indicating what to include
+                in the search results.
         :param bool exact: if True, try to match the name exactly
         :return: list of ``SearchResult``
         :rtype: list of :py:class:`boardgamegeek.search.SearchResult`
@@ -699,6 +713,119 @@ class BGGCommon(object):
 
         return results
 
+    def thing(self, name=None, thing_id=None, choose=BGGChoose.FIRST, versions=False, videos=False, historical=False,
+              marketplace=False, comments=False, rating_comments=False, progress=None, thing_type=None):
+        """
+        Get information about a thing (boardgame, rpg, videogame).
+
+        :param str name: If not None, get information about a thing with this name
+        :param integer thing_id:  If not None, get information about a thing with this id
+        :param str choose: method of selecting the thing by name, when dealing with multiple results.
+                           Valid values are : "first", "recent" or "best-rank"
+        :param bool versions: include versions information
+        :param bool videos: include videos
+        :param bool historical: include historical data
+        :param bool marketplace: include marketplace data
+        :param bool comments: include comments
+        :param bool rating_comments: include comments with rating (ignored in favor of ``comments``, if that is true)
+        :param callable progress: callable for reporting progress if fetching comments
+        :param :py:class:`boardgamegeek.api.BGGThingType` thing_type: what kind of `thing` to retrieve
+        :return: ``BoardGame`` object
+        :rtype: :py:class:`boardgamegeek.games.BoardGame`
+
+        :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekError` in case of invalid name or game_id
+        :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekAPIRetryError` if this request should be retried after a
+                 short delay
+        :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekAPIError` if the response couldn't be parsed
+        :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekTimeoutError` if there was a timeout
+        """
+
+        if not name and thing_id is None:
+            raise BGGError("thing name or id not specified")
+
+        if thing_id is None:
+            thing_id = self.get_thing_id(name, thing_type=thing_type, choose=choose)
+            if thing_id is None:
+                raise BGGItemNotFoundError
+
+        log.debug("retrieving thing id {}{}".format(thing_id, " ({})".format(name) if name is not None else ""))
+
+        params = {"id": thing_id,
+                  "versions": int(versions),
+                  "videos": int(videos),
+                  "historical": int(historical),
+                  "marketplace": int(marketplace),
+                  "comments": int(comments),
+                  "ratingcomments": int(rating_comments),
+                  "pagesize": 100,
+                  "type": "rpgitem",
+                  "page": 1,
+                  "stats": 1}
+
+        xml_root = request_and_parse_xml(self.requests_session,
+                                         self._thing_api_url,
+                                         params=params,
+                                         timeout=self._timeout,
+                                         retries=self._retries,
+                                         retry_delay=self._retry_delay)
+
+        xml_root = xml_root.find("item")
+        if xml_root is None:
+            msg = "invalid data for game id: {}{}".format(thing_id, "" if name is None else " ({})".format(name))
+            raise BGGApiError(msg)
+
+        game = create_game_from_xml(xml_root,
+                                    game_id=thing_id)
+
+        if not (comments or rating_comments):
+            return game
+
+        added_items, total = add_game_comments_from_xml(game, xml_root)
+
+        try:
+            call_progress_cb(progress, len(game.comments), total)
+        except:
+            return game
+
+        page = 1
+        while added_items and len(game.comments) < total:
+            page += 1
+
+            params['page'] = page
+            xml_root = request_and_parse_xml(self.requests_session,
+                                             self._thing_api_url,
+                                             params={"id": thing_id,
+                                                     "pagesize": 100,
+                                                     "comments": int(comments),
+                                                     "ratingcomments": int(rating_comments),
+                                                     "page": page},
+                                             timeout=self._timeout,
+                                             retries=self._retries,
+                                             retry_delay=self._retry_delay)
+
+            xml_root = xml_root.find("item")
+            if xml_root is None:
+                msg = "invalid data for thing id: {}{}".format(thing_id, "" if name is None else " ({})".format(name))
+                raise BGGApiError(msg)
+
+            added_items, total = add_game_comments_from_xml(game, xml_root)
+
+            try:
+                call_progress_cb(progress, len(game.comments), total)
+            except:
+                break
+
+        return game
+
+    def things(self, name, thing_type):
+        """
+        Return a list containing all the things of the specified type
+        :param name:
+        :param thing_type:
+        :return:
+        """
+        return [self.thing(thing_id=s.id) for s in self.search(name, search_type=thing_type, exact=True)]
+
 
 class BGGClient(BGGCommon):
     """
@@ -747,9 +874,10 @@ class BGGClient(BGGCommon):
         :raises: :py:exc:`boardgamegeek.exceptions.BGGApiError` if the response couldn't be parsed
         :raises: :py:exc:`boardgamegeek.exceptions.BGGApiTimeoutError` if there was a timeout
         """
-        return self._get_game_id(name, game_type=BGGRestrictSearchResultsTo.BOARD_GAME, choose=choose)
+        return self.get_thing_id(name, thing_type=BGGRestrictSearchResultsTo.BOARD_GAME, choose=choose)
 
     def game_list(self, game_id_list, versions=False,
+
                   videos=False, historical=False, marketplace=False):
         """
         Get list of games by from a list of ids.
@@ -791,7 +919,7 @@ class BGGClient(BGGCommon):
 
         xml_root = xml_root.findall("item")
         if xml_root is None:
-            msg = "invalid data for game ids: {}".format(game_id_list,)
+            msg = "invalid data for game ids: {}".format(game_id_list)
             raise BGGApiError(msg)
 
         game_list = []
@@ -828,83 +956,12 @@ class BGGClient(BGGCommon):
         :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekTimeoutError` if there was a timeout
         """
 
-        if not name and game_id is None:
-            raise BGGError("game name or id not specified")
+        return self.thing(name=name, thing_id=game_id, choose=choose, versions=versions,
+                          videos=videos, historical=historical, marketplace=marketplace,
+                          comments=comments, rating_comments=rating_comments, progress=progress,
+                          thing_type=BGGThingTypes.BOARD_GAME)
 
-        if game_id is None:
-            game_id = self.get_game_id(name, choose=choose)
-            if game_id is None:
-                raise BGGItemNotFoundError
-
-        log.debug("retrieving game id {}{}".format(game_id, " ({})".format(name) if name is not None else ""))
-
-        params = {"id": game_id,
-                  "versions": int(versions),
-                  "videos": int(videos),
-                  "historical": int(historical),
-                  "marketplace": int(marketplace),
-                  "comments": int(comments),
-                  "ratingcomments": int(rating_comments),
-                  "pagesize": 100,
-                  "page": 1,
-                  "stats": 1}
-
-        xml_root = request_and_parse_xml(self.requests_session,
-                                         self._thing_api_url,
-                                         params=params,
-                                         timeout=self._timeout,
-                                         retries=self._retries,
-                                         retry_delay=self._retry_delay)
-
-        xml_root = xml_root.find("item")
-        if xml_root is None:
-            msg = "invalid data for game id: {}{}".format(game_id, "" if name is None else " ({})".format(name))
-            raise BGGApiError(msg)
-
-        game = create_game_from_xml(xml_root,
-                                    game_id=game_id)
-
-        if not (comments or rating_comments):
-            return game
-
-        added_items, total = add_game_comments_from_xml(game, xml_root)
-
-        try:
-            call_progress_cb(progress, len(game.comments), total)
-        except:
-            return game
-
-        page = 1
-        while added_items and len(game.comments) < total:
-            page += 1
-
-            params['page'] = page
-            xml_root = request_and_parse_xml(self.requests_session,
-                                             self._thing_api_url,
-                                             params={"id": game_id,
-                                                     "pagesize": 100,
-                                                     "comments": int(comments),
-                                                     "ratingcomments": int(rating_comments),
-                                                     "page": page},
-                                             timeout=self._timeout,
-                                             retries=self._retries,
-                                             retry_delay=self._retry_delay)
-
-            xml_root = xml_root.find("item")
-            if xml_root is None:
-                msg = "invalid data for game id: {}{}".format(game_id, "" if name is None else " ({})".format(name))
-                raise BGGApiError(msg)
-
-            added_items, total = add_game_comments_from_xml(game, xml_root)
-
-            try:
-                call_progress_cb(progress, len(game.comments), total)
-            except:
-                break
-
-        return game
-
-    def games(self, name):
+    def games(self, name, search_type=None):
         """
         Return a list containing all games with the given name
 
@@ -914,7 +971,10 @@ class BGGClient(BGGCommon):
         :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekAPIError` if the response couldn't be parsed
         :raises: :py:exc:`boardgamegeek.exceptions.BoardGameGeekTimeoutError` if there was a timeout
         """
-        return [self.game(game_id=s.id)
+        if search_type is None:
+            search_type = [BGGRestrictSearchResultsTo.BOARD_GAME, BGGRestrictSearchResultsTo.BOARD_GAME_EXPANSION]
+
+        return [self.thing(thing_id=s.id, thing_type=search_type)
                 for s in self.search(name,
-                                     search_type=[BGGRestrictSearchResultsTo.BOARD_GAME, BGGRestrictSearchResultsTo.BOARD_GAME_EXPANSION],
+                                     search_type=search_type,
                                      exact=True)]

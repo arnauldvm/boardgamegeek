@@ -123,13 +123,13 @@ def test_rate_limiting_for_requests():
     # create two threads, give each a list of games to fetch, disable cache and time the amount needed to
     # fetch the data. requests should be serialized, even if made from two different threads
 
-    test_set_1 = [5,     # acquire
-                  31260, # agricola
-                  72125] # "eclipse"
+    test_set_1 = [49762,  # fatal
+                  162994, # D&D5 players handbook
+                  194513] # bloodlust metal
 
-    test_set_2 = [18602, # caylus
-                  28720, # brass
-                  53953] # thunderstone]
+    test_set_2 = [54245,  # eclipse phase
+                  44809,  # toon
+                  267152] # D20 3.5 SRD
 
     def _worker_thread(games):
         bgg = BGGClient(cache=None, requests_per_minute=20)
