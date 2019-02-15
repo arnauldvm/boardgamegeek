@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?><items termsofuse="https://boardgamegeek.com/xmlapi/termsofuse"><item type="rpgitem" id="43359">
+         <thumbnail>https://cf.geekdo-images.com/thumb/img/AXfwLNne2EdLEQRBNilSeKlaIqQ=/fit-in/200x150/pic498210.jpg</thumbnail>
+      <image>https://cf.geekdo-images.com/original/img/0Yj-k_wxuKiAzWaN3Pt7kTlf5N8=/0x0/pic498210.jpg</image>
+                                     				
+				<name type="primary" sortindex="1" value="Players Handbook (AD&amp;D 1e)" />
+			
+						                               				
+				<name type="alternate" sortindex="1" value="AD&amp;D PHB" />
+			    				
+				<name type="alternate" sortindex="1" value="Player&#039;s Handbook" />
+			    				
+				<name type="alternate" sortindex="1" value="Player&#039;s Handbook Original" />
+			    				
+				<name type="alternate" sortindex="1" value="Spieler Handbuch" />
+			
+						      				
+		 			
+
+			
+		
+					<link type="rpg" id="191" value="Advanced Dungeons &amp; Dragons (1st Edition)" />
+		
+									
+			
+
+			               													<description>From the back cover:&amp;#10;&amp;quot;No more searching through stacks of books and magazines to find out what you need to know. The Player's Handbook puts it all at your fingertips, including:&amp;#10;&amp;#10;     All recommended character classes - Fighters, Paladins, Rangers, Magic-Users, etc.&amp;#10;     Character Races - Dwarves, Elves, Gnomes, Half-Orcs, Humans, etc.&amp;#10;     Character level statistics&amp;#10;     Equipment lists with costs&amp;#10;     Spell listings by level and descriptions of effects (including many new spells)&amp;#10;&amp;#10;&amp;#10;&amp;#10;&amp;#10;As a Dungeon Adventurer or a Dungeon Master, you will find the contents of this book to be what you have been waiting for.  All useful material is now compiled under one cover, especially for players!&amp;quot;&amp;#10;&amp;#10;</description>
+										               				<yearpublished value="1978" />
+						      				
+		 			
+
+			
+		
+					<link type="rpggenre" id="155" value="Fantasy (High Fantasy)" />
+		
+									
+			
+
+			      			
+
+			      				
+		 			
+
+			
+		
+					<link type="rpgseries" id="9583" value="TSR Silver Anniversary Miniature Reprints" />
+		
+									
+			
+
+			               				<seriescode value="" />
+						      				
+		 			
+
+			
+		
+					<link type="rpgcategory" id="2083" value="Core Rules (min needed to play)" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="rpgmechanic" id="2101" value="Attribute/Stat Based (STR, CON, PER, etc)" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgmechanic" id="2095" value="Class Based (Pilot, Wizard, Scientist, etc)" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgmechanic" id="2122" value="Dice (Various)" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgmechanic" id="2096" value="Level Based (Earn XP and level up)" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgmechanic" id="2133" value="Race Based (Player Race/Species affects gameplay)" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgmechanic" id="2134" value="Random Attribute Generation (during Character Creation)" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="rpgpublisher" id="26" value="Games Workshop Ltd." />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgpublisher" id="16" value="TSR" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgpublisher" id="2103" value="Twenty-First Century Games" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgpublisher" id="13" value="Wizards of the Coast" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="rpgdesigner" id="561" value="Gary Gygax" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="rpgartist" id="13312" value="Jeff Easley" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgartist" id="7271" value="David C. Sutherland, III" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="rpgartist" id="98" value="David A. Trampier" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="rpgproducer" id="1600" value="Mike Carr" />
+		
+									
+			
+
+			
+	
+
+	
+
+	
+	
+	
+   		<statistics page="1">
+								<ratings >
+			<usersrated value="416" />
+			<average value="7.87788" />
+			<bayesaverage value="7.64384" />
+
+			<ranks>
+															<rank type="subtype" id="16" name="rpgitem" friendlyname="RPG Item Rank" value="42" bayesaverage="7.64384" />
+												</ranks>
+
+			<stddev value="1.51429" />
+			<median value="0" />
+			<owned value="1740" />
+			<trading value="46" />
+			<wanting value="9" />
+			<wishing value="7" />
+			<numcomments value="116" />
+			<numweights value="26" />
+			<averageweight value="2.9231" />
+			</ratings>
+								</statistics>
+     
+	
+          
+</item>
+</items>

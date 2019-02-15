@@ -8,8 +8,9 @@ import time
 
 from _common import *
 from boardgamegeek import BGGError, BGGItemNotFoundError, BGGValueError
-from boardgamegeek.objects.games import BoardGameVideo, BoardGameVersion, BoardGameRank
-from boardgamegeek.objects.games import PlayerSuggestion
+from boardgamegeek.objects.games import BoardGame, VideoGame, RPGItem
+from boardgamegeek.objects.games import BoardGameVersion, PlayerSuggestion
+from boardgamegeek.objects.things import BoardGameRank, BoardGameVideo
 
 
 def test_get_unknown_game_info(bgg, mocker):
@@ -38,6 +39,7 @@ def test_get_game_with_invalid_parameters(bgg, mocker):
 
 def check_game(game):
     assert game is not None
+    assert isinstance(game, BoardGame)
     assert game.name == TEST_GAME_NAME
     assert game.id == TEST_GAME_ID
     assert game.year == 2007
@@ -264,3 +266,99 @@ def test_get_accessory(bgg, mocker):
 
     assert game.id == TEST_GAME_ACCESSORY_ID
     assert game.accessory
+
+
+def test_get_rpgitem(bgg, mocker):
+    mock_get = mocker.patch("requests.sessions.Session.get")
+    mock_get.side_effect = simulate_bgg
+
+    game = bgg.game(game_id=TEST_RPG_ITEM_ID)
+
+    assert isinstance(game, RPGItem)
+
+    assert game.id == TEST_RPG_ITEM_ID
+
+    assert len(game.categories) == 1
+    assert game.categories[0] == "Core Rules (min needed to play)"
+
+    assert len(game.mechanics) == 6
+    assert "Attribute/Stat Based (STR, CON, PER, etc)" in game.mechanics
+    assert "Class Based (Pilot, Wizard, Scientist, etc)" in game.mechanics
+    assert "Dice (Various)" in game.mechanics
+    assert "Level Based (Earn XP and level up)" in game.mechanics
+    assert "Race Based (Player Race/Species affects gameplay)" in game.mechanics
+    assert "Random Attribute Generation (during Character Creation)" in game.mechanics
+
+    assert len(game.designers) == 1
+    assert game.designers[0] == "Gary Gygax"
+
+    assert len(game.artists) == 3
+    assert "Jeff Easley" in game.artists
+    assert "David C. Sutherland, III" in game.artists
+    assert "David A. Trampier" in game.artists
+
+    assert len(game.publishers) == 4
+    assert "Games Workshop Ltd." in game.publishers
+    assert "TSR" in game.publishers
+    assert "Twenty-First Century Games" in game.publishers
+    assert "Wizards of the Coast" in game.publishers
+
+    assert len(game.genres) == 1
+    assert game.genres[0] == "Fantasy (High Fantasy)"
+
+    assert len(game.series) == 1
+    assert game.series[0] == "TSR Silver Anniversary Miniature Reprints"
+
+    assert len(game.producers) == 1
+    assert game.producers[0] == "Mike Carr"
+
+    assert len(game.rpg) == 1
+    assert game.rpg[0] == "Advanced Dungeons & Dragons (1st Edition)"
+
+
+def test_get_videogame(bgg, mocker):
+    mock_get = mocker.patch("requests.sessions.Session.get")
+    mock_get.side_effect = simulate_bgg
+
+    game = bgg.game(game_id=TEST_VIDEO_GAME_ID)
+
+    assert isinstance(game, VideoGame)
+
+    assert game.id == TEST_VIDEO_GAME_ID
+
+    assert len(game.publishers) == 1
+    assert game.publishers[0] == "Nintendo Co., Ltd."
+
+    assert len(game.platforms) == 5
+    assert "Game Boy Advance" in game.platforms
+    assert "NES" in game.platforms
+    assert "Nintendo 3DS" in game.platforms
+    assert "Wii" in game.platforms
+    assert "Wii U" in game.platforms
+
+    assert len(game.genres) == 1
+    assert game.genres[0] == "Platform"
+
+    assert len(game.themes) == 1
+    assert game.themes[0] == "Cute Fantasy"
+
+    assert len(game.franchises) == 2
+    assert "Mario" in game.franchises
+    assert "NES Black Box (1980s NES Games, US)" in game.franchises
+
+    assert len(game.series) == 1
+    assert game.series[0] == "Super Mario"
+
+    assert len(game.modes) == 2
+    assert "Cooperative" in game.modes
+    assert "Single-Player" in game.modes
+
+    assert len(game.developers) == 1
+    assert game.developers[0] == "Nintendo Co., Ltd."
+
+    assert len(game.compilations) == 5
+    assert "Nintendo World Championships 1990" in game.compilations
+    assert "Super Mario All-Stars" in game.compilations
+    assert "Super Mario Bros. / Duck Hunt" in game.compilations
+    assert "Super Mario Bros. / Duck Hunt / World Class Track Meet" in game.compilations
+    assert "Super Mario Bros. / Tetris / Nintendo World Cup" in game.compilations
